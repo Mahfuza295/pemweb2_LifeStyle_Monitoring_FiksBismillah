@@ -27,7 +27,7 @@
                         <i class="fa-solid fa-heart-pulse text-xl"></i>
                     </div>
 
-                    <!-- <div>
+                    <div>
                         <h1 class="font-bold text-lg text-slate-800">
                             Lifestyle Monitor
                         </h1>
@@ -35,7 +35,7 @@
                         <p class="text-sm text-slate-400">
                             Healthy Life App
                         </p>
-                    </div> -->
+                    </div>
 
                 </div>
             </div>
@@ -142,10 +142,7 @@
                     </p>
                 </div>
 
-                <div class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">
-                    <i class="fa-solid fa-shield-heart mr-1"></i>
-                    SDGs Target 3.4
-                </div>
+                
 
             </header>
 
