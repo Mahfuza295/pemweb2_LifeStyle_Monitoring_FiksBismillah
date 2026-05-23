@@ -12,10 +12,10 @@
         <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
             <i class="fa-solid fa-code text-2xl"></i>
         </div>
-        <div>
+        <!-- <div>
             <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Coding</span>
             <h3 class="font-bold text-slate-800 text-sm mt-0.5 line-clamp-2">Cara Memulai Belajar Framework Laravel 11 untuk Pemula</h3>
-        </div>
+        </div> -->
     </div>
 
     <!-- Card Artikel 2 -->

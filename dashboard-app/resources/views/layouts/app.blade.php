@@ -81,9 +81,9 @@
             
             <!-- TOP BAR (HEADER ATAS) -->
             <header class="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-30">
-                <div class="text-xs font-medium text-slate-400">
+                <!-- <div class="text-xs font-medium text-slate-400">
                     Sistem Monitoring Kesehatan & Pencegahan Penyakit Tidak Menular (PTM)
-                </div>
+                </div> -->
                 <div class="flex items-center gap-4">
                     <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-xs font-bold tracking-wide">
                          <i class="fa-solid fa-shield-heart mr-1"></i> SDGs Target 3.4
