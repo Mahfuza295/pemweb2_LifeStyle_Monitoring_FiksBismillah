@@ -23,7 +23,7 @@
                     </div>
                     <div>
                         <h2 class="font-bold text-slate-950 text-sm leading-tight">Lifestyle Monitor</h2>
-                        <span class="text-[10px] text-blue-600 font-semibold uppercase tracking-wider">SDGs 3 Platform</span>
+                       
                     </div>
                 </div>
             </div>
