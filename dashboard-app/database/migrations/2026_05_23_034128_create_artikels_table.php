@@ -9,16 +9,15 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up()
-{
-    Schema::create('artikels', function (Blueprint $table) {
-        $table->id();
-        $table->string('judul');
-        $table->text('isi')->nullable();
-        $table->string('gambar');
-        $table->string('link')->nullable();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('artikels', function (Blueprint $table) {
+            $table->id();
+            $table->string('judul');
+            $table->string('gambar')->nullable();
+            $table->string('link')->nullable();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

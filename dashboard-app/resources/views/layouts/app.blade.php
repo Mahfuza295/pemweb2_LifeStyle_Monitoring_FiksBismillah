@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,13 +17,13 @@
 
     <div class="flex min-h-screen">
 
-        <!-- SIDEBAR -->
+        <!--sidebar-->
         <aside class="w-64 bg-white shadow-lg fixed h-full">
 
-            <!-- Logo -->
+            <!--logo-->
             <div class="p-6 border-b">
                 <div class="flex items-center gap-3">
-                    
+
                     <div class="bg-blue-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-md">
                         <i class="fa-solid fa-heart-pulse text-xl"></i>
                     </div>
@@ -40,52 +41,48 @@
                 </div>
             </div>
 
-            <!-- Menu -->
+            <!--menu-->
             <nav class="p-4 space-y-2">
 
                 <p class="text-xs text-slate-400 uppercase font-semibold px-3 mb-3">
                     Menu Utama
                 </p>
 
-                <!-- Dashboard -->
-                <a href="{{ route('dashboard') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                   {{ request()->routeIs('dashboard') 
-                      ? 'bg-blue-600 text-white shadow-md' 
-                      : 'hover:bg-slate-100' }}">
+                <!--dashboard-->
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                   {{ request()->routeIs('dashboard')
+    ? 'bg-blue-600 text-white shadow-md'
+    : 'hover:bg-slate-100' }}">
 
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <!-- Aktivitas -->
-                <a href="{{ route('aktivitas') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                   {{ request()->routeIs('aktivitas') 
-                      ? 'bg-blue-600 text-white shadow-md' 
-                      : 'hover:bg-slate-100' }}">
+                <!--aktivitas-->
+                <a href="{{ route('aktivitas') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                   {{ request()->routeIs('aktivitas')
+    ? 'bg-blue-600 text-white shadow-md'
+    : 'hover:bg-slate-100' }}">
 
                     <i class="fa-solid fa-circle-plus w-5 text-center"></i>
                     <span>Input Aktivitas</span>
                 </a>
 
-                <!-- Artikel -->
-                <a href="{{ route('artikel') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                   {{ request()->routeIs('artikel') 
-                      ? 'bg-blue-600 text-white shadow-md' 
-                      : 'hover:bg-slate-100' }}">
+                <!--artikel-->
+                <a href="{{ route('artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+   {{ request()->routeIs('artikel.index')
+    ? 'bg-blue-600 text-white shadow-md'
+    : 'hover:bg-slate-100' }}">
 
                     <i class="fa-solid fa-newspaper w-5 text-center"></i>
                     <span>Artikel Edukasi</span>
                 </a>
 
-                <!-- Profil -->
-                <a href="{{ route('profil') }}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                   {{ request()->routeIs('profil') 
-                      ? 'bg-blue-600 text-white shadow-md' 
-                      : 'hover:bg-slate-100' }}">
+                <!--profil-->
+                <a href="{{ route('profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                   {{ request()->routeIs('profil')
+    ? 'bg-blue-600 text-white shadow-md'
+    : 'hover:bg-slate-100' }}">
 
                     <i class="fa-solid fa-user w-5 text-center"></i>
                     <span>Profil Pengguna</span>
@@ -93,14 +90,15 @@
 
             </nav>
 
-            <!-- User -->
+            <!--pengguna-->
             <div class="absolute bottom-0 w-full p-4 border-t bg-slate-50">
 
                 <div class="flex items-center justify-between">
 
                     <div class="flex items-center gap-3">
 
-                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+                        <div
+                            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
                             M
                         </div>
 
@@ -126,10 +124,10 @@
 
         </aside>
 
-        <!-- MAIN CONTENT -->
+        <!--main content-->
         <div class="flex-1 ml-64">
 
-            <!-- HEADER -->
+            <!--header-->
             <header class="bg-white shadow-sm px-8 py-5 flex justify-between items-center">
 
                 <div>
@@ -142,11 +140,11 @@
                     </p>
                 </div>
 
-            
+
 
             </header>
 
-            <!-- CONTENT -->
+            <!--content-->
             <main class="p-8">
                 @yield('content')
             </main>
@@ -156,4 +154,5 @@
     </div>
 
 </body>
+
 </html>

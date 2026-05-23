@@ -10,7 +10,7 @@
             <div class="card shadow h-100">
 
                 <!-- gambar -->
-                <img src="{{ $artikel['gambar'] }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <img src="{{ asset('gambar/' . $artikel->gambar) }}" alt="gambar artikel" class="card-img-top" style="height: 200px; object-fit: cover;">
 
                 <div class="card-body text-center">
 

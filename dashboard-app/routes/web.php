@@ -7,7 +7,7 @@ use App\Http\Controllers\ArtikelController;
 //halaman utama langsung ke dashboard
 Route::get('/', [PageController::class, 'dashboard']);
 
-// Navigasi Menu Dashboard
+//navigasi Menu Dashboard
 Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 Route::get('/aktivitas', [PageController::class, 'aktivitas'])->name('aktivitas');
 Route::get('/artikel', [ArtikelController::class, 'index'])->name('artikel.index');
