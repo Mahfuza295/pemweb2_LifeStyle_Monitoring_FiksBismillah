@@ -47,7 +47,8 @@
         transition: border-color .2s ease, box-shadow .2s ease;
     }
 
-    .activity-field:focus {
+    .activity-field:focus,
+    .activity-date-input:focus {
         border-color: var(--primary);
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
     }
@@ -64,6 +65,11 @@
         background-size: 8px 8px, 8px 8px;
         background-repeat: no-repeat;
         padding-right: 3rem;
+    }
+
+    .activity-date-input::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.75;
     }
 
     .status-chip {
@@ -109,20 +115,20 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
                         Input Aktivitas Harian
                     </h1>
+
                     <p class="mt-2 text-sm sm:text-base text-slate-500">
                         Tanggal Terpilih:
                         <span id="tanggalLabel" class="font-semibold text-slate-700"></span>
                     </p>
                 </div>
 
-                <div class="relative shrink-0">
-                    <button type="button" id="btnPilihTanggal"
-                        class="activity-btn-primary w-full sm:w-auto text-white px-6 py-3 rounded-xl text-sm sm:text-base font-semibold transition">
+                <div class="shrink-0 w-full sm:w-auto">
+                    <label for="tanggalInput" class="block text-sm font-semibold text-slate-600 mb-2">
                         Pilih Tanggal
-                    </button>
+                    </label>
 
                     <input type="date" id="tanggalInput" value="{{ $tanggalAwal }}"
-                        class="absolute inset-0 opacity-0 cursor-pointer">
+                        class="activity-date-input w-full sm:w-auto min-w-[220px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm sm:text-base font-semibold text-slate-700 outline-none transition cursor-pointer">
                 </div>
             </div>
         </div>
@@ -135,6 +141,7 @@
                     <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Pagi</h2>
                     <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
                 </div>
+
                 <span class="session-status status-chip bg-slate-100 text-slate-500">
                     Belum Diisi
                 </span>
@@ -146,6 +153,7 @@
                     <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Siang</h2>
                     <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
                 </div>
+
                 <span class="session-status status-chip bg-slate-100 text-slate-500">
                     Belum Diisi
                 </span>
@@ -157,6 +165,7 @@
                     <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Malam</h2>
                     <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
                 </div>
+
                 <span class="session-status status-chip bg-slate-100 text-slate-500">
                     Belum Diisi
                 </span>
@@ -195,6 +204,7 @@
                     Input Aktivitas Sesi:
                     <span id="sessionTitle">PAGI</span>
                 </h1>
+
                 <p class="mt-2 text-sm text-slate-500">
                     Isi data sesuai aktivitas pada sesi waktu ini.
                 </p>
@@ -206,6 +216,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Pilih Nama Makanan
                     </label>
+
                     <select id="makanan" class="activity-field activity-select">
                         <option>Nasi Goreng</option>
                         <option>Nasi Uduk</option>
@@ -226,6 +237,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Jenis Minuman
                     </label>
+
                     <select id="minuman" class="activity-field activity-select">
                         <option>Air Putih</option>
                         <option>Teh Manis</option>
@@ -241,6 +253,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Jumlah Air Minum
                     </label>
+
                     <input type="number" min="0" max="30" step="1" id="gelas"
                         placeholder="Contoh: 2" class="activity-field">
                 </div>
@@ -249,6 +262,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Aktivitas Olahraga
                     </label>
+
                     <select id="olahragaJenis" class="activity-field activity-select">
                         <option>Tidak Ada</option>
                         <option>Jalan Santai</option>
@@ -265,6 +279,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Durasi Olahraga
                     </label>
+
                     <input type="number" min="0" max="300" step="1" id="olahragaDurasi"
                         placeholder="Durasi dalam menit" class="activity-field">
                 </div>
@@ -284,6 +299,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">
                         Durasi Tidur
                     </label>
+
                     <input type="number" min="0" max="24" step="0.5" id="tidurJam"
                         placeholder="Durasi tidur dalam jam" class="activity-field">
                 </div>
@@ -304,6 +320,7 @@
                 <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
                     Riwayat Data Harian
                 </h2>
+
                 <p class="mt-1 text-sm text-slate-500">
                     Data aktivitas yang sudah pernah disimpan.
                 </p>
@@ -317,6 +334,7 @@
                                 <h3 class="text-lg sm:text-xl font-bold text-slate-800">
                                     Hari Aktivitas: {{ date('j-n-Y', strtotime($item->tanggal)) }}
                                 </h3>
+
                                 <p class="text-sm text-slate-500 mt-1">
                                     Ringkasan aktivitas harian Anda.
                                 </p>
@@ -402,7 +420,9 @@
         const olahragaDurasi = document.getElementById('olahragaDurasi');
 
         const formatTanggal = (value) => {
-            if (!value) return '-';
+            if (!value) {
+                return '-';
+            }
 
             const [year, month, day] = value.split('-');
 
@@ -488,11 +508,18 @@
             });
         };
 
-        document.getElementById('btnPilihTanggal').addEventListener('click', () => {
-            tanggalInput.showPicker ? tanggalInput.showPicker() : tanggalInput.click();
+        tanggalInput.addEventListener('click', () => {
+            if (typeof tanggalInput.showPicker === 'function') {
+                try {
+                    tanggalInput.showPicker();
+                } catch (error) {
+                    // Jika browser tidak mendukung showPicker, input tanggal tetap bisa diklik manual.
+                }
+            }
         });
 
         tanggalInput.addEventListener('change', updateTanggal);
+        tanggalInput.addEventListener('input', updateTanggal);
 
         document.querySelectorAll('[data-session-card]').forEach((button) => {
             button.addEventListener('click', () => {
