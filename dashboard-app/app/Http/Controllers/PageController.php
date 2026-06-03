@@ -68,17 +68,17 @@ class PageController extends Controller
     public function storeAktivitas(Request $request)
     {
         $data = $request->validate([
-            'tanggal' => 'required|date',
-            'makan' => 'required|integer|min:0|max:10',
-            'olahraga' => 'required|integer|min:0|max:300',
-            'tidur' => 'required|numeric|min:0|max:24',
+            'tanggal'   => 'required|date',
+            'makan'     => 'required|integer|min:0|max:10',
+            'olahraga'  => 'required|integer|min:0|max:300',
+            'tidur'     => 'required|numeric|min:0|max:24',
             'air_minum' => 'required|integer|min:0|max:30',
-            'catatan' => 'nullable|string|max:500',
+            'catatan'   => 'nullable|string|max:500',
         ], [
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'makan.required' => 'Jumlah makan wajib diisi.',
-            'olahraga.required' => 'Durasi olahraga wajib diisi.',
-            'tidur.required' => 'Durasi tidur wajib diisi.',
+            'tanggal.required'   => 'Tanggal wajib diisi.',
+            'makan.required'     => 'Jumlah makan wajib diisi.',
+            'olahraga.required'  => 'Durasi olahraga wajib diisi.',
+            'tidur.required'     => 'Durasi tidur wajib diisi.',
             'air_minum.required' => 'Jumlah air minum wajib diisi.',
         ]);
 
@@ -92,7 +92,9 @@ class PageController extends Controller
             $data
         );
 
-        return redirect()->route('aktivitas')->with('success', 'Aktivitas harian berhasil disimpan.');
+        return redirect()
+            ->route('aktivitas')
+            ->with('success', 'Aktivitas harian berhasil disimpan.');
     }
 
     public function artikel()
