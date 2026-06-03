@@ -26,6 +26,7 @@ class AktivitasHarian extends Model
     public function getSkorAttribute(): int
     {
         $skor = 0;
+
         $skor += min((int) $this->makan, 3) * 10;
         $skor += min((int) $this->olahraga, 30) / 30 * 25;
         $skor += min((float) $this->tidur, 8) / 8 * 25;
