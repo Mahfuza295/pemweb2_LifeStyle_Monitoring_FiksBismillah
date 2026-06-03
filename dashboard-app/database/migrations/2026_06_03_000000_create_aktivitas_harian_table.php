@@ -10,7 +10,12 @@ return new class extends Migration
     {
         Schema::create('aktivitas_harian', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
             $table->date('tanggal');
             $table->integer('makan')->default(0);
             $table->integer('olahraga')->default(0);
