@@ -1,183 +1,591 @@
 @extends('layouts.app')
 
-@section('title', 'Input Aktivitas')
+@section('title', 'Input Aktivitas Harian')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-900">Catat Aktivitas Kesehatan</h1>
-    <p class="text-sm text-slate-500">Masukkan aktivitas makan, olahraga, tidur, dan air minum harian Anda.</p>
-</div>
+@php
+    $tanggalAwal = old('tanggal', date('Y-m-d'));
+@endphp
 
-@if (session('success'))
-    <div class="mb-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-        <i class="fa-solid fa-circle-check mr-2"></i>
-        {{ session('success') }}
-    </div>
-@endif
+<style>
+    .activity-page {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-soft: #dbeafe;
+        --border: #e2e8f0;
+        --text: #1e293b;
+    }
 
-@if ($errors->any())
-    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-        <p class="font-semibold mb-2">Ada data yang belum benar:</p>
-        <ul class="list-disc pl-5 space-y-1">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+    .activity-card {
+        border: 1px solid var(--border);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border p-6">
-        <form method="POST" action="{{ route('aktivitas.store') }}" class="space-y-5">
+    .activity-card:hover {
+        box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    }
+
+    .activity-btn-primary {
+        background: var(--primary);
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+    }
+
+    .activity-btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .activity-field {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 0.9rem;
+        background: #ffffff;
+        padding: 0.95rem 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text);
+        outline: none;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .activity-field:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .activity-field::placeholder {
+        color: #94a3b8;
+    }
+
+    .activity-select {
+        appearance: none;
+        background-image: linear-gradient(45deg, transparent 50%, #64748b 50%),
+            linear-gradient(135deg, #64748b 50%, transparent 50%);
+        background-position: calc(100% - 22px) 50%, calc(100% - 14px) 50%;
+        background-size: 8px 8px, 8px 8px;
+        background-repeat: no-repeat;
+        padding-right: 3rem;
+    }
+
+    .status-chip {
+        border-radius: 999px;
+        padding: .35rem .75rem;
+        font-size: .8rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+        .activity-mobile-wrap {
+            margin-left: -0.25rem;
+            margin-right: -0.25rem;
+        }
+    }
+</style>
+
+<div class="activity-page activity-mobile-wrap max-w-5xl mx-auto">
+
+    @if (session('success'))
+        <div class="mb-5 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-medium text-green-700">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+            <p class="font-semibold mb-2">Ada data yang belum benar:</p>
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    {{-- HALAMAN PILIH SESI --}}
+    <section id="dailyView">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                        Input Aktivitas Harian
+                    </h1>
+                    <p class="mt-2 text-sm sm:text-base text-slate-500">
+                        Tanggal Terpilih:
+                        <span id="tanggalLabel" class="font-semibold text-slate-700"></span>
+                    </p>
+                </div>
+
+                <div class="relative shrink-0">
+                    <button type="button" id="btnPilihTanggal"
+                        class="activity-btn-primary w-full sm:w-auto text-white px-6 py-3 rounded-xl text-sm sm:text-base font-semibold transition">
+                        Pilih Tanggal
+                    </button>
+
+                    <input type="date" id="tanggalInput" value="{{ $tanggalAwal }}"
+                        class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 mb-6">
+
+            <button type="button" data-session-card="pagi"
+                class="session-card activity-card w-full bg-white rounded-2xl px-5 py-5 flex items-center justify-between gap-4 text-left transition">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Pagi</h2>
+                    <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
+                </div>
+                <span class="session-status status-chip bg-slate-100 text-slate-500">
+                    Belum Diisi
+                </span>
+            </button>
+
+            <button type="button" data-session-card="siang"
+                class="session-card activity-card w-full bg-white rounded-2xl px-5 py-5 flex items-center justify-between gap-4 text-left transition">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Siang</h2>
+                    <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
+                </div>
+                <span class="session-status status-chip bg-slate-100 text-slate-500">
+                    Belum Diisi
+                </span>
+            </button>
+
+            <button type="button" data-session-card="malam"
+                class="session-card activity-card w-full bg-white rounded-2xl px-5 py-5 flex items-center justify-between gap-4 text-left transition">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800">Sesi Malam</h2>
+                    <p class="session-summary mt-1 text-sm text-slate-500 hidden"></p>
+                </div>
+                <span class="session-status status-chip bg-slate-100 text-slate-500">
+                    Belum Diisi
+                </span>
+            </button>
+
+        </div>
+
+        <form id="dailySubmitForm" method="POST" action="{{ route('aktivitas.store') }}">
             @csrf
 
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Tanggal</label>
-                <input type="date" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-            </div>
+            <input type="hidden" name="tanggal" id="formTanggal" value="{{ $tanggalAwal }}">
+            <input type="hidden" name="makan" id="formMakan" value="0">
+            <input type="hidden" name="olahraga" id="formOlahraga" value="0">
+            <input type="hidden" name="tidur" id="formTidur" value="0">
+            <input type="hidden" name="air_minum" id="formAirMinum" value="0">
+            <input type="hidden" name="catatan" id="formCatatan" value="">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Makan</label>
-                    <div class="relative">
-                        <input type="number" name="makan" min="0" max="10" value="{{ old('makan', 3) }}" required
-                            class="w-full px-4 py-3 pr-16 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-                        <span class="absolute right-4 top-3 text-sm text-slate-400">kali</span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Olahraga</label>
-                    <div class="relative">
-                        <input type="number" name="olahraga" min="0" max="300" value="{{ old('olahraga', 30) }}" required
-                            class="w-full px-4 py-3 pr-20 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-                        <span class="absolute right-4 top-3 text-sm text-slate-400">menit</span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Tidur</label>
-                    <div class="relative">
-                        <input type="number" step="0.1" name="tidur" min="0" max="24" value="{{ old('tidur', 7) }}" required
-                            class="w-full px-4 py-3 pr-16 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-                        <span class="absolute right-4 top-3 text-sm text-slate-400">jam</span>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Air Minum</label>
-                    <div class="relative">
-                        <input type="number" name="air_minum" min="0" max="30" value="{{ old('air_minum', 8) }}" required
-                            class="w-full px-4 py-3 pr-16 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-                        <span class="absolute right-4 top-3 text-sm text-slate-400">gelas</span>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Catatan</label>
-                <textarea name="catatan" rows="4" placeholder="Contoh: hari ini badan terasa segar"
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">{{ old('catatan') }}</textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md shadow-blue-200">
-                <i class="fa-solid fa-floppy-disk mr-2"></i>
-                Simpan Aktivitas
+            <button type="button" id="btnKirimData"
+                class="activity-btn-primary w-full text-white py-4 rounded-xl text-base sm:text-lg font-bold tracking-wide transition">
+                Kirim ke Data Harian
             </button>
         </form>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-2xl shadow-sm border p-6">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                <i class="fa-solid fa-heart-pulse"></i>
-            </div>
-            <div>
-                <h2 class="font-bold text-slate-800">Rumus Skor</h2>
-                <p class="text-xs text-slate-400">Skor dihitung otomatis</p>
-            </div>
-        </div>
+    {{-- HALAMAN FORM PER SESI --}}
+    <section id="sessionView" class="hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
 
-        <div class="space-y-3 text-sm text-slate-600">
-            <div class="flex justify-between bg-slate-50 rounded-xl px-3 py-2">
-                <span>Makan maksimal</span>
-                <span class="font-semibold">30 poin</span>
+            <button type="button" id="btnKembali"
+                class="mb-5 text-sm font-semibold text-slate-500 hover:text-blue-600 transition">
+                Kembali ke pilihan sesi
+            </button>
+
+            <div class="mb-6">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                    Input Aktivitas Sesi:
+                    <span id="sessionTitle">PAGI</span>
+                </h1>
+                <p class="mt-2 text-sm text-slate-500">
+                    Isi data sesuai aktivitas pada sesi waktu ini.
+                </p>
             </div>
-            <div class="flex justify-between bg-slate-50 rounded-xl px-3 py-2">
-                <span>Olahraga maksimal</span>
-                <span class="font-semibold">25 poin</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded-xl px-3 py-2">
-                <span>Tidur maksimal</span>
-                <span class="font-semibold">25 poin</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 rounded-xl px-3 py-2">
-                <span>Air minum maksimal</span>
-                <span class="font-semibold">20 poin</span>
-            </div>
+
+            <form id="sessionForm" class="space-y-6">
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Pilih Nama Makanan
+                    </label>
+                    <select id="makanan" class="activity-field activity-select">
+                        <option>Nasi Goreng</option>
+                        <option>Nasi Uduk</option>
+                        <option>Nasi Putih</option>
+                        <option>Roti</option>
+                        <option>Bubur Ayam</option>
+                        <option>Mie Goreng</option>
+                        <option>Sayur</option>
+                        <option>Buah</option>
+                        <option>Protein</option>
+                        <option>Junk Food</option>
+                        <option>Minuman Manis</option>
+                        <option>Tidak Makan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Jenis Minuman
+                    </label>
+                    <select id="minuman" class="activity-field activity-select">
+                        <option>Air Putih</option>
+                        <option>Teh Manis</option>
+                        <option>Kopi</option>
+                        <option>Jus</option>
+                        <option>Susu</option>
+                        <option>Minuman Bersoda</option>
+                        <option>Tidak Ada</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Jumlah Air Minum
+                    </label>
+                    <input type="number" min="0" max="30" step="1" id="gelas"
+                        placeholder="Contoh: 2" class="activity-field">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Aktivitas Olahraga
+                    </label>
+                    <select id="olahragaJenis" class="activity-field activity-select">
+                        <option>Tidak Ada</option>
+                        <option>Jalan Santai</option>
+                        <option>Jogging</option>
+                        <option>Bersepeda</option>
+                        <option>Push Up</option>
+                        <option>Yoga</option>
+                        <option>Gym</option>
+                        <option>Renang</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Durasi Olahraga
+                    </label>
+                    <input type="number" min="0" max="300" step="1" id="olahragaDurasi"
+                        placeholder="Durasi dalam menit" class="activity-field">
+                </div>
+
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">
+                        Istirahat / Tidur
+                    </label>
+
+                    <label class="flex items-center gap-3 text-base text-slate-700 cursor-pointer select-none">
+                        <input type="checkbox" id="tidurCheck" class="w-5 h-5 accent-blue-600">
+                        <span>Saya tidur pada sesi waktu ini</span>
+                    </label>
+                </div>
+
+                <div id="tidurInputWrap" class="hidden">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Durasi Tidur
+                    </label>
+                    <input type="number" min="0" max="24" step="0.5" id="tidurJam"
+                        placeholder="Durasi tidur dalam jam" class="activity-field">
+                </div>
+
+                <button type="submit"
+                    class="activity-btn-primary w-full text-white py-4 rounded-xl text-base sm:text-lg font-bold tracking-wide transition">
+                    Simpan Sesi Ini
+                </button>
+
+            </form>
         </div>
-    </div>
+    </section>
+
+    {{-- RIWAYAT DATA HARIAN --}}
+    @if(isset($riwayat) && $riwayat->count())
+        <section class="mt-8">
+            <div class="mb-5">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">
+                    Riwayat Data Harian
+                </h2>
+                <p class="mt-1 text-sm text-slate-500">
+                    Data aktivitas yang sudah pernah disimpan.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-5">
+                @foreach($riwayat as $item)
+                    <div class="activity-card bg-white rounded-2xl p-5 sm:p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-bold text-slate-800">
+                                    Hari Aktivitas: {{ date('j-n-Y', strtotime($item->tanggal)) }}
+                                </h3>
+                                <p class="text-sm text-slate-500 mt-1">
+                                    Ringkasan aktivitas harian Anda.
+                                </p>
+                            </div>
+
+                            <span class="status-chip bg-blue-100 text-blue-700">
+                                Skor {{ $item->skor }}%
+                            </span>
+                        </div>
+
+                        @if($item->catatan)
+                            <div class="text-sm text-slate-600 leading-7 mb-5 rounded-xl bg-slate-50 border border-slate-100 p-4">
+                                {!! nl2br(e($item->catatan)) !!}
+                            </div>
+                        @endif
+
+                        <div class="border-t pt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-600">
+                            <p>
+                                <span class="font-semibold text-slate-700">Total Air Diminum:</span>
+                                {{ $item->air_minum }} Gelas
+                            </p>
+
+                            <p>
+                                <span class="font-semibold text-slate-700">Total Olahraga:</span>
+                                {{ $item->olahraga }} Menit
+                            </p>
+
+                            <p>
+                                <span class="font-semibold text-slate-700">Total Tidur:</span>
+                                {{ $item->tidur }} Jam
+                            </p>
+
+                            <p>
+                                <span class="font-semibold text-slate-700">Kategori:</span>
+                                {{ $item->kategori }}
+                            </p>
+                        </div>
+
+                        <a href="{{ route('dashboard') }}"
+                            class="mt-5 block activity-btn-primary text-center text-white py-3 rounded-xl text-sm sm:text-base font-bold transition">
+                            Cek Skor Kesehatan Anda
+                        </a>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
 </div>
 
-@if(isset($riwayat) && $riwayat->count())
-    <div class="mt-8 bg-white rounded-2xl shadow-sm border p-6">
-        <h2 class="font-bold text-slate-800 mb-4">Riwayat Aktivitas Terakhir</h2>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sessions = {
+            pagi: null,
+            siang: null,
+            malam: null,
+        };
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-left text-slate-500 border-b">
-                        <th class="py-3">Tanggal</th>
-                        <th class="py-3">Makan</th>
-                        <th class="py-3">Olahraga</th>
-                        <th class="py-3">Tidur</th>
-                        <th class="py-3">Air Minum</th>
-                        <th class="py-3">Skor</th>
-                        <th class="py-3">Kategori</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($riwayat as $item)
-                        <tr class="border-b last:border-b-0">
-                            <td class="py-3 font-semibold text-slate-700">{{ date('d/m/Y', strtotime($item->tanggal)) }}</td>
-                            <td class="py-3">{{ $item->makan }} kali</td>
-                            <td class="py-3">{{ $item->olahraga }} menit</td>
-                            <td class="py-3">{{ $item->tidur }} jam</td>
-                            <td class="py-3">{{ $item->air_minum }} gelas</td>
-                            <td class="py-3 font-bold text-blue-600">{{ $item->skor }}/100</td>
-                            <td class="py-3">{{ $item->kategori }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-@endif
-@endsection@extends('layouts.app')
+        const sessionLabels = {
+            pagi: 'PAGI',
+            siang: 'SIANG',
+            malam: 'MALAM',
+        };
 
-@section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-900">Catat Aktivitas</h1>
-    <p class="text-sm text-slate-500">Masukkan kegiatan harian Anda di bawah ini.</p>
-</div>
+        const sessionReadable = {
+            pagi: 'Pagi',
+            siang: 'Siang',
+            malam: 'Malam',
+        };
 
-<form class="space-y-4">
-    <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Aktivitas</label>
-        <input type="text" placeholder="Contoh: Belajar Pemrograman PHP" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-    </div>
+        let activeSession = 'pagi';
 
-    <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>
-        <select class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 bg-slate-50 text-sm">
-            <option>Edukasi</option>
-            <option>Kesehatan</option>
-        </select>
-    </div>
+        const dailyView = document.getElementById('dailyView');
+        const sessionView = document.getElementById('sessionView');
+        const sessionTitle = document.getElementById('sessionTitle');
+        const tanggalInput = document.getElementById('tanggalInput');
+        const tanggalLabel = document.getElementById('tanggalLabel');
+        const formTanggal = document.getElementById('formTanggal');
+        const tidurCheck = document.getElementById('tidurCheck');
+        const tidurInputWrap = document.getElementById('tidurInputWrap');
+        const tidurJam = document.getElementById('tidurJam');
+        const olahragaJenis = document.getElementById('olahragaJenis');
+        const olahragaDurasi = document.getElementById('olahragaDurasi');
 
-    <button type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-md shadow-blue-200">
-        Simpan Aktivitas
-    </button>
-</form>
+        const formatTanggal = (value) => {
+            if (!value) return '-';
+
+            const [year, month, day] = value.split('-');
+
+            return `${Number(day)}-${Number(month)}-${year}`;
+        };
+
+        const numberValue = (id) => {
+            const value = document.getElementById(id).value;
+
+            return value === '' ? 0 : Number(value);
+        };
+
+        const showDaily = () => {
+            sessionView.classList.add('hidden');
+            dailyView.classList.remove('hidden');
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+
+        const showSession = (key) => {
+            activeSession = key;
+            sessionTitle.textContent = sessionLabels[key];
+
+            const data = sessions[key] || {
+                makanan: key === 'pagi' ? 'Nasi Goreng' : 'Nasi Putih',
+                minuman: 'Air Putih',
+                gelas: '',
+                olahragaJenis: 'Tidak Ada',
+                olahragaDurasi: '',
+                tidurCheck: false,
+                tidurJam: '',
+            };
+
+            document.getElementById('makanan').value = data.makanan;
+            document.getElementById('minuman').value = data.minuman;
+            document.getElementById('gelas').value = data.gelas;
+            olahragaJenis.value = data.olahragaJenis;
+            olahragaDurasi.value = data.olahragaDurasi;
+            tidurCheck.checked = data.tidurCheck;
+            tidurJam.value = data.tidurJam;
+
+            tidurInputWrap.classList.toggle('hidden', !tidurCheck.checked);
+
+            dailyView.classList.add('hidden');
+            sessionView.classList.remove('hidden');
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+
+        const updateTanggal = () => {
+            tanggalLabel.textContent = formatTanggal(tanggalInput.value);
+            formTanggal.value = tanggalInput.value;
+        };
+
+        const updateCards = () => {
+            document.querySelectorAll('[data-session-card]').forEach((card) => {
+                const key = card.getAttribute('data-session-card');
+                const data = sessions[key];
+                const status = card.querySelector('.session-status');
+                const summary = card.querySelector('.session-summary');
+
+                if (data) {
+                    status.textContent = 'Sudah Diisi';
+                    status.classList.remove('bg-slate-100', 'text-slate-500');
+                    status.classList.add('bg-green-100', 'text-green-700');
+
+                    summary.textContent = `${data.makanan}, ${data.gelas || 0} gelas, olahraga ${data.olahragaDurasi || 0} menit`;
+                    summary.classList.remove('hidden');
+                } else {
+                    status.textContent = 'Belum Diisi';
+                    status.classList.add('bg-slate-100', 'text-slate-500');
+                    status.classList.remove('bg-green-100', 'text-green-700');
+
+                    summary.textContent = '';
+                    summary.classList.add('hidden');
+                }
+            });
+        };
+
+        document.getElementById('btnPilihTanggal').addEventListener('click', () => {
+            tanggalInput.showPicker ? tanggalInput.showPicker() : tanggalInput.click();
+        });
+
+        tanggalInput.addEventListener('change', updateTanggal);
+
+        document.querySelectorAll('[data-session-card]').forEach((button) => {
+            button.addEventListener('click', () => {
+                showSession(button.getAttribute('data-session-card'));
+            });
+        });
+
+        document.getElementById('btnKembali').addEventListener('click', showDaily);
+
+        tidurCheck.addEventListener('change', () => {
+            tidurInputWrap.classList.toggle('hidden', !tidurCheck.checked);
+
+            if (!tidurCheck.checked) {
+                tidurJam.value = '';
+            }
+        });
+
+        olahragaJenis.addEventListener('change', () => {
+            if (olahragaJenis.value === 'Tidak Ada') {
+                olahragaDurasi.value = '';
+            }
+        });
+
+        document.getElementById('sessionForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const data = {
+                makanan: document.getElementById('makanan').value,
+                minuman: document.getElementById('minuman').value,
+                gelas: numberValue('gelas'),
+                olahragaJenis: olahragaJenis.value,
+                olahragaDurasi: olahragaJenis.value === 'Tidak Ada' ? 0 : numberValue('olahragaDurasi'),
+                tidurCheck: tidurCheck.checked,
+                tidurJam: tidurCheck.checked ? numberValue('tidurJam') : 0,
+            };
+
+            if (data.gelas < 0 || data.olahragaDurasi < 0 || data.tidurJam < 0) {
+                alert('Angka tidak boleh kurang dari 0.');
+                return;
+            }
+
+            sessions[activeSession] = data;
+
+            updateCards();
+            showDaily();
+        });
+
+        document.getElementById('btnKirimData').addEventListener('click', () => {
+            const filledSessions = Object.entries(sessions).filter(([, data]) => data !== null);
+
+            if (filledSessions.length === 0) {
+                alert('Isi minimal satu sesi terlebih dahulu.');
+                return;
+            }
+
+            const totalMakan = filledSessions.filter(([, data]) => {
+                return data.makanan !== 'Tidak Makan';
+            }).length;
+
+            const totalAir = filledSessions.reduce((sum, [, data]) => {
+                return sum + Number(data.gelas || 0);
+            }, 0);
+
+            const totalOlahraga = filledSessions.reduce((sum, [, data]) => {
+                return sum + Number(data.olahragaDurasi || 0);
+            }, 0);
+
+            const totalTidur = filledSessions.reduce((sum, [, data]) => {
+                return sum + Number(data.tidurJam || 0);
+            }, 0);
+
+            const catatan = filledSessions.map(([key, data]) => {
+                const rincian = [
+                    `Makan ${data.makanan}`,
+                    `Minum ${data.minuman} ${data.gelas || 0} gelas`,
+                    `Olahraga ${data.olahragaJenis} ${data.olahragaDurasi || 0} menit`,
+                    data.tidurCheck ? `Tidur ${data.tidurJam || 0} jam` : 'Tidak tidur pada sesi ini',
+                ];
+
+                return `Sesi ${sessionReadable[key]}: ${rincian.join(', ')}`;
+            }).join('\n');
+
+            document.getElementById('formMakan').value = totalMakan;
+            document.getElementById('formAirMinum').value = totalAir;
+            document.getElementById('formOlahraga').value = totalOlahraga;
+            document.getElementById('formTidur').value = totalTidur;
+            document.getElementById('formCatatan').value = catatan;
+
+            document.getElementById('dailySubmitForm').submit();
+        });
+
+        updateTanggal();
+        updateCards();
+    });
+</script>
 @endsection
