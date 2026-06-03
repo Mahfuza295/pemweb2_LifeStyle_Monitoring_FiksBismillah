@@ -4,10 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ArtikelController;
 
-// halaman utama langsung ke dashboard
 Route::get('/', [PageController::class, 'dashboard']);
 
-// navigasi menu utama
 Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
 Route::get('/aktivitas', [PageController::class, 'aktivitas'])->name('aktivitas');
 Route::post('/aktivitas', [PageController::class, 'storeAktivitas'])->name('aktivitas.store');
