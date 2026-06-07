@@ -11,6 +11,7 @@ class AktivitasHarian extends Model
     protected $fillable = [
         'user_id',
         'tanggal',
+        'sesi',
         'makan',
         'olahraga',
         'tidur',
