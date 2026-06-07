@@ -21,9 +21,9 @@ class PageController extends Controller
             $skorKesehatan = $aktivitasTerakhir->skor;
 
             $ringkasanAktivitas = [
-                'makan' => $aktivitasTerakhir->makan . ' kali',
-                'olahraga' => $aktivitasTerakhir->olahraga . ' menit',
-                'tidur' => $aktivitasTerakhir->tidur . ' jam',
+                'makan'     => $aktivitasTerakhir->makan . ' kali',
+                'olahraga'  => $aktivitasTerakhir->olahraga . ' menit',
+                'tidur'     => $aktivitasTerakhir->tidur . ' jam',
                 'air_minum' => $aktivitasTerakhir->air_minum . ' gelas',
             ];
 
@@ -32,9 +32,9 @@ class PageController extends Controller
             $skorKesehatan = 0;
 
             $ringkasanAktivitas = [
-                'makan' => 'Belum ada data',
-                'olahraga' => 'Belum ada data',
-                'tidur' => 'Belum ada data',
+                'makan'     => 'Belum ada data',
+                'olahraga'  => 'Belum ada data',
+                'tidur'     => 'Belum ada data',
                 'air_minum' => 'Belum ada data',
             ];
 
@@ -54,10 +54,13 @@ class PageController extends Controller
 
     public function aktivitas()
     {
-        $riwayat = AktivitasHarian::where('user_id', auth()->id())
-            ->orderBy('tanggal', 'desc')
-            ->limit(5)
-            ->get();
+        $query = AktivitasHarian::query();
+
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $riwayat = $query->latest('tanggal')->take(5)->get();
 
         return view('pages.aktivitas', compact('riwayat'));
     }
@@ -65,17 +68,17 @@ class PageController extends Controller
     public function storeAktivitas(Request $request)
     {
         $data = $request->validate([
-            'tanggal' => 'required|date',
-            'makan' => 'required|integer|min:0|max:10',
-            'olahraga' => 'required|integer|min:0|max:300',
-            'tidur' => 'required|numeric|min:0|max:24',
+            'tanggal'   => 'required|date',
+            'makan'     => 'required|integer|min:0|max:10',
+            'olahraga'  => 'required|integer|min:0|max:300',
+            'tidur'     => 'required|numeric|min:0|max:24',
             'air_minum' => 'required|integer|min:0|max:30',
-            'catatan' => 'nullable|string|max:500',
+            'catatan'   => 'nullable|string|max:500',
         ], [
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'makan.required' => 'Jumlah makan wajib diisi.',
-            'olahraga.required' => 'Durasi olahraga wajib diisi.',
-            'tidur.required' => 'Durasi tidur wajib diisi.',
+            'tanggal.required'   => 'Tanggal wajib diisi.',
+            'makan.required'     => 'Jumlah makan wajib diisi.',
+            'olahraga.required'  => 'Durasi olahraga wajib diisi.',
+            'tidur.required'     => 'Durasi tidur wajib diisi.',
             'air_minum.required' => 'Jumlah air minum wajib diisi.',
         ]);
 
@@ -98,14 +101,7 @@ class PageController extends Controller
     {
         return view('pages.artikel');
     }
-    public function dataHarian()
-    {
-        $data = AktivitasHarian::where('user_id', auth()->id())
-            ->latest('tanggal')
-            ->get();
 
-        return view('pages.data-harian', compact('data'));
-    }
     public function profil()
     {
         return view('pages.profil');

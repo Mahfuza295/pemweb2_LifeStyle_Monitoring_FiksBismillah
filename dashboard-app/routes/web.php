@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ArtikelController;
-use App\Http\Controllers\DataHarianController;
-
 
 Route::get('/', [PageController::class, 'dashboard']);
 
@@ -13,5 +11,3 @@ Route::get('/aktivitas', [PageController::class, 'aktivitas'])->name('aktivitas'
 Route::post('/aktivitas', [PageController::class, 'storeAktivitas'])->name('aktivitas.store');
 Route::get('/artikel', [ArtikelController::class, 'index'])->name('artikel.index');
 Route::get('/profil', [PageController::class, 'profil'])->name('profil');
-Route::get('/data-harian', [PageController::class, 'dataHarian'])->name('data-harian');
-Route::post('/aktivitas', [DataHarianController::class, 'store'])->name('aktivitas.store');
