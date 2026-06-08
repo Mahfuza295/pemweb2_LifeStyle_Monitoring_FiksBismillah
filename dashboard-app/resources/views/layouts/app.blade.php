@@ -114,9 +114,14 @@
 
                     </div>
 
-                    <button class="text-slate-400 hover:text-red-500 transition">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </button>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button
+                            type="submit"
+                            class="text-slate-400 hover:text-red-500 transition">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
 
                 </div>
 
@@ -139,8 +144,6 @@
                         Sistem Monitoring Kesehatan
                     </p>
                 </div>
-
-
 
             </header>
 
