@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\AktivitasHarian;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AktivitasExport;
 
 class PageController extends Controller
 {
@@ -39,8 +42,8 @@ class PageController extends Controller
             ];
 
             $rekomendasiHarian = [
-                'Silakan isi aktivitas harian terlebih dahulu melalui menu Input Aktivitas.',
-                'Setelah data disimpan, skor kesehatan akan muncul otomatis di dashboard.',
+                'Silakan isi aktivitas harian terlebih dahulu.',
+                'Data akan muncul setelah disimpan.',
             ];
         }
 
@@ -52,14 +55,11 @@ class PageController extends Controller
         ));
     }
 
-    // 1. Halaman Input Aktivitas (Hanya fokus untuk form input saja)
     public function aktivitas()
     {
-        // Kita tidak perlu mengambil riwayat lagi di sini agar bersih
         return view('pages.aktivitas');
     }
 
-    // 2. HALAMAN BARU: Tampil Semua Riwayat Data Harian
     public function riwayatIndex()
     {
         $query = AktivitasHarian::query();
@@ -68,10 +68,8 @@ class PageController extends Controller
             $query->where('user_id', auth()->id());
         }
 
-        // Mengambil semua data riwayat dari yang paling baru tanpa dibatasi take(5)
         $riwayat = $query->latest('tanggal')->get();
 
-        // Mengarah ke file baru: resources/views/pages/riwayat.blade.php
         return view('pages.riwayat', compact('riwayat'));
     }
 
@@ -84,12 +82,6 @@ class PageController extends Controller
             'tidur' => 'required|numeric|min:0|max:24',
             'air_minum' => 'required|integer|min:0|max:30',
             'catatan' => 'nullable|string|max:500',
-        ], [
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'makan.required' => 'Jumlah makan wajib diisi.',
-            'olahraga.required' => 'Durasi olahraga wajib diisi.',
-            'tidur.required' => 'Durasi tidur wajib diisi.',
-            'air_minum.required' => 'Jumlah air minum wajib diisi.',
         ]);
 
         $data['user_id'] = auth()->id();
@@ -102,9 +94,8 @@ class PageController extends Controller
             $data
         );
 
-        return redirect()
-            ->route('aktivitas')
-            ->with('success', 'Aktivitas harian berhasil disimpan.');
+        return redirect()->route('aktivitas')
+            ->with('success', 'Aktivitas berhasil disimpan.');
     }
 
     public function artikel()
@@ -117,32 +108,53 @@ class PageController extends Controller
         return view('pages.profil');
     }
 
+    // INI EXPORT PDF (BENAR)
+    public function exportPdf()
+    {
+        $query = AktivitasHarian::query();
+
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $riwayat = $query->latest('tanggal')->get();
+
+        $pdf = Pdf::loadView('pages.export-pdf', compact('riwayat'));
+
+        return $pdf->download('riwayat-aktivitas.pdf');
+    }
+
+    public function exportExcel()
+{
+    return Excel::download(new AktivitasExport, 'riwayat-aktivitas.xlsx');
+}
+
     private function buatRekomendasi(AktivitasHarian $aktivitas): array
     {
         $rekomendasi = [];
 
         if ($aktivitas->tidur < 7) {
-            $rekomendasi[] = 'Durasi tidur masih kurang. Usahakan tidur 7-8 jam setiap hari.';
+            $rekomendasi[] = 'Tidur kurang dari 7 jam.';
         } else {
-            $rekomendasi[] = 'Durasi tidur sudah cukup baik. Pertahankan pola istirahat Anda.';
+            $rekomendasi[] = 'Tidur sudah cukup.';
         }
 
         if ($aktivitas->air_minum < 8) {
-            $rekomendasi[] = 'Minum air putih masih kurang. Coba targetkan sekitar 8 gelas per hari.';
+            $rekomendasi[] = 'Kurang minum air.';
         } else {
-            $rekomendasi[] = 'Konsumsi air minum sudah baik. Pertahankan agar tubuh tetap terhidrasi.';
+            $rekomendasi[] = 'Hidrasi sudah baik.';
         }
 
         if ($aktivitas->olahraga < 30) {
-            $rekomendasi[] = 'Aktivitas olahraga masih rendah. Coba olahraga ringan minimal 30 menit.';
+            $rekomendasi[] = 'Kurang olahraga.';
         } else {
-            $rekomendasi[] = 'Aktivitas olahraga sudah bagus. Lanjutkan kebiasaan sehat ini.';
+            $rekomendasi[] = 'Olahraga cukup.';
         }
 
         if ($aktivitas->makan < 3) {
-            $rekomendasi[] = 'Pola makan masih kurang teratur. Usahakan makan utama 3 kali sehari.';
+            $rekomendasi[] = 'Pola makan kurang.';
         } else {
-            $rekomendasi[] = 'Pola makan sudah cukup teratur.';
+            $rekomendasi[] = 'Pola makan baik.';
         }
 
         return $rekomendasi;

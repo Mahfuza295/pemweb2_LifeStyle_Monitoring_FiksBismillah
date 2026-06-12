@@ -55,3 +55,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::get('/riwayat-aktivitas', [PageController::class, 'riwayatIndex'])->name('riwayat.index');
+
+Route::get('/riwayat/export/pdf', [PageController::class, 'exportPdf'])
+    ->name('riwayat.export.pdf');
+
+Route::get('/riwayat/export/excel', [PageController::class, 'exportExcel'])
+    ->name('riwayat.export.excel');

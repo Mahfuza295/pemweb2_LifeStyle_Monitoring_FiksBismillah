@@ -11,6 +11,17 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {{-- DataTables CSS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+    {{-- jQuery --}}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    {{-- DataTables JS --}}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
 </head>
 
 <body class="bg-slate-100 font-sans text-slate-700">
@@ -71,7 +82,7 @@
                 <!--artikel-->
                 @if(auth()->user()->role == 'admin')
                             <a href="{{ route('admin.artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                                    {{ request()->routeIs('admin.artikel.*')
+                                                {{ request()->routeIs('admin.artikel.*')
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'hover:bg-slate-100' }}">
                                 <i class="fa-solid fa-newspaper w-5 text-center"></i>
@@ -79,7 +90,7 @@
                             </a>
                 @else
                             <a href="{{ route('artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                                    {{ request()->routeIs('artikel.index')
+                                                {{ request()->routeIs('artikel.index')
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'hover:bg-slate-100' }}">
                                 <i class="fa-solid fa-newspaper w-5 text-center"></i>
@@ -88,13 +99,15 @@
                 @endif
 
 
+
                 <!--riwayat harian -->
-                <a href="{{ route('riwayat.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                <a href="{{ route('riwayat.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition
                    {{ request()->routeIs('riwayat.index') ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-slate-100' }}">
                     <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
                     <span>Riwayat Data Harian</span>
                 </a>
-                
+
 
                 <!--profil-->
                 <a href="{{ route('profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
