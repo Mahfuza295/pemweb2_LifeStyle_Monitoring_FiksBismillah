@@ -69,14 +69,20 @@
                 </a>
 
                 <!--artikel-->
-                <a href="{{ route('artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-   {{ request()->routeIs('artikel.index')
-    ? 'bg-blue-600 text-white shadow-md'
-    : 'hover:bg-slate-100' }}">
-
-                    <i class="fa-solid fa-newspaper w-5 text-center"></i>
-                    <span>Artikel Edukasi</span>
-                </a>
+                <!-- artikel -->
+                @if(auth()->user()->role == 'admin')
+                    <a href="{{ route('admin.artikel.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100">
+                        <i class="fa-solid fa-newspaper w-5 text-center"></i>
+                        <span>Kelola Artikel</span>
+                    </a>
+                @else
+                    <a href="{{ route('artikel.index') }}"
+                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100">
+                        <i class="fa-solid fa-newspaper w-5 text-center"></i>
+                        <span>Artikel Edukasi</span>
+                    </a>
+                @endif
 
                 <!--profil-->
                 <a href="{{ route('profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
@@ -116,9 +122,7 @@
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button
-                            type="submit"
-                            class="text-slate-400 hover:text-red-500 transition">
+                        <button type="submit" class="text-slate-400 hover:text-red-500 transition">
                             <i class="fa-solid fa-right-from-bracket"></i>
                         </button>
                     </form>

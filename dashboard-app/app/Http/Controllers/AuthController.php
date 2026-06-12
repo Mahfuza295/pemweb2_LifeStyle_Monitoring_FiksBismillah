@@ -21,16 +21,18 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        // Cukup lakukan pengecekan Auth::attempt sekali saja
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
             return redirect()->route('dashboard');
         }
 
-        return back()
-            ->with('error', 'Email atau password salah.')
-            ->withInput();
-    }
+        // Kembalikan ke halaman login dengan pesan error jika email/password salah
+        return back()->withErrors([
+            'email' => 'Email atau password yang Anda masukkan salah.',
+        ])->onlyInput('email');
+    } // <-- Kurung kurawal penutup fungsi login sekarang sudah ada
 
     public function showRegister()
     {
@@ -42,12 +44,13 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6|confirmed', // Pastikan di form input ada name="password_confirmation"
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'role' => 'pengguna',
             'password' => Hash::make($request->password),
         ]);
 
