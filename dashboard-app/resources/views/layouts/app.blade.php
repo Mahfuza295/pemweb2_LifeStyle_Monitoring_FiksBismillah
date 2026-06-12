@@ -19,8 +19,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     {{-- DataTables JS --}}
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 
 </head>
 
@@ -82,7 +82,7 @@
                 <!--artikel-->
                 @if(auth()->user()->role == 'admin')
                             <a href="{{ route('admin.artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                                                {{ request()->routeIs('admin.artikel.*')
+                                                                                    {{ request()->routeIs('admin.artikel.*')
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'hover:bg-slate-100' }}">
                                 <i class="fa-solid fa-newspaper w-5 text-center"></i>
@@ -90,7 +90,7 @@
                             </a>
                 @else
                             <a href="{{ route('artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
-                                                {{ request()->routeIs('artikel.index')
+                                                                                    {{ request()->routeIs('artikel.index')
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'hover:bg-slate-100' }}">
                                 <i class="fa-solid fa-newspaper w-5 text-center"></i>
@@ -130,22 +130,22 @@
 
                         <div
                             class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
-                            M
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                         </div>
 
                         <div>
                             <h3 class="text-sm font-semibold">
-                                Mahfuza
+                                {{ auth()->user()->name }}
                             </h3>
 
                             <p class="text-xs text-slate-400">
-                                User Aktif
+                                {{ auth()->user()->role }}
                             </p>
                         </div>
 
                     </div>
 
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form action="{{ route('logout') }}" method="POST" onsubmit="return confirm('Yakin ingin logout?')">
                         @csrf
                         <button type="submit" class="text-slate-400 hover:text-red-500 transition">
                             <i class="fa-solid fa-right-from-bracket"></i>

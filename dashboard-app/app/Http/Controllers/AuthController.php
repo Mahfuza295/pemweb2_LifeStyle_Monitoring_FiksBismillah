@@ -23,8 +23,7 @@ class AuthController extends Controller
 
         // Cukup lakukan pengecekan Auth::attempt sekali saja
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
+            $request->session()->regenerate(); // ini WAJIB
             return redirect()->route('dashboard');
         }
 
@@ -64,8 +63,10 @@ class AuthController extends Controller
         Auth::logout();
 
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect('/login')
+            ->with('success', 'Berhasil logout.');
     }
 }

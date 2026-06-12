@@ -16,39 +16,37 @@ class AktivitasHarian extends Model
         'tidur',
         'air_minum',
         'catatan',
+        'skor',
     ];
 
+    // AUTO HITUNG SKOR SAAT SIMPAN
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+
+            $skor = 0;
+
+            $skor += ($model->makan >= 3) ? 25 : 10;
+            $skor += ($model->olahraga >= 30) ? 25 : 10;
+            $skor += ($model->tidur >= 7) ? 25 : 10;
+            $skor += ($model->air_minum >= 8) ? 25 : 10;
+
+            $model->skor = $skor;
+        });
+    }
+
+    // RELASI
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function getSkorAttribute(): int
-    {
-        $skor = 0;
-
-        $skor += min((int) $this->makan, 3) * 10;
-        $skor += min((int) $this->olahraga, 30) / 30 * 25;
-        $skor += min((float) $this->tidur, 8) / 8 * 25;
-        $skor += min((int) $this->air_minum, 8) / 8 * 20;
-
-        return (int) round($skor);
-    }
-
+    // OPTIONAL: kategori saja (ini aman)
     public function getKategoriAttribute(): string
     {
-        if ($this->skor >= 85) {
-            return 'Sangat Baik';
-        }
-
-        if ($this->skor >= 70) {
-            return 'Baik';
-        }
-
-        if ($this->skor >= 55) {
-            return 'Cukup';
-        }
-
+        if ($this->skor >= 85) return 'Sangat Baik';
+        if ($this->skor >= 70) return 'Baik';
+        if ($this->skor >= 55) return 'Cukup';
         return 'Perlu Ditingkatkan';
     }
 }

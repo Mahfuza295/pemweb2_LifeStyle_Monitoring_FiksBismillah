@@ -44,14 +44,27 @@
         </div>
 
         <div class="mt-6 border-t border-white/20 pt-4 text-sm">
-            <i class="fa-solid fa-circle-check text-green-300"></i>
-            Kondisi kesehatan Anda sangat baik.
-        </div>
+
+    @if($skorKesehatan >= 80)
+        <i class="fa-solid fa-circle-check text-green-300"></i>
+        Kondisi kesehatan Anda sangat baik.
+    @elseif($skorKesehatan >= 60)
+        <i class="fa-solid fa-circle-exclamation text-yellow-300"></i>
+        Kondisi kesehatan Anda cukup baik, tetap jaga pola hidup.
+    @elseif($skorKesehatan >= 40)
+        <i class="fa-solid fa-triangle-exclamation text-orange-300"></i>
+        Kondisi kesehatan Anda kurang baik, perlu diperbaiki.
+    @else
+        <i class="fa-solid fa-xmark text-red-300"></i>
+        Kondisi kesehatan Anda buruk, segera perbaiki gaya hidup.
+    @endif
+
+</div>
 
     </div>
 
 
-    <!-- REKOMENDASI -->
+    <!-- REKOMENDASI --> 
     <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border">
 
         <div class="flex items-center gap-2 mb-5">

@@ -26,6 +26,10 @@
 
             <thead class="bg-slate-100 text-left">
                 <tr>
+                    @if(auth()->user()->role == 'admin')
+                        <th class="p-3">Nama Pengguna</th>
+                    @endif
+
                     <th class="p-3">Tanggal</th>
                     <th class="p-3">Makan</th>
                     <th class="p-3">Olahraga</th>
@@ -55,6 +59,12 @@
             <tbody>
                 @foreach($riwayat as $item)
                     <tr class="border-b">
+                        @if(auth()->user()->role == 'admin')
+                            <td class="p-3 font-medium text-slate-800">
+                                {{ $item->user?->name ?? 'User Tidak Ditemukan' }}
+                            </td>
+                        @endif
+
                         <td class="p-3">{{ $item->tanggal }}</td>
                         <td class="p-3">{{ $item->makan }}</td>
                         <td class="p-3">{{ $item->olahraga }}</td>

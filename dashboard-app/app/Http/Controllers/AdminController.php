@@ -7,26 +7,20 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    // 1. Dashboard Admin
-    public function dashboard()
-    {
-        return view('admin.dashboard');
-    }
-
-    // 2. Tampil Daftar Artikel
+    // 1. Tampil Daftar Artikel
     public function artikelIndex()
     {
         $artikels = Artikel::latest()->get();
         return view('admin.artikel.index', compact('artikels'));
     }
 
-    // 3. Tampil Form Tambah Artikel
+    // 2. Create
     public function artikelCreate()
     {
         return view('admin.artikel.create');
     }
 
-    // 4. Proses Simpan Artikel Baru ke Database
+    // 3. Store
     public function artikelStore(Request $request)
     {
         $request->validate([
@@ -39,20 +33,18 @@ class AdminController extends Controller
             'link' => $request->link,
         ]);
 
-        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil ditambahkan!');
+        return redirect()->route('admin.artikel.index')
+            ->with('success', 'Artikel berhasil ditambahkan!');
     }
 
-    // 5. Tampil Form Edit Artikel (INI YANG KITA PERBAIKI)
+    // 4. Edit
     public function artikelEdit($id)
     {
-        // Ambil data artikel asli dari DB berdasarkan ID
-        $artikel = Artikel::findOrFail($id); 
-
-        // Oper variabel $artikel ke view edit.blade.php
+        $artikel = Artikel::findOrFail($id);
         return view('admin.artikel.edit', compact('artikel'));
     }
 
-    // 6. Proses Update Data Artikel di Database
+    // 5. Update
     public function artikelUpdate(Request $request, $id)
     {
         $request->validate([
@@ -61,20 +53,19 @@ class AdminController extends Controller
         ]);
 
         $artikel = Artikel::findOrFail($id);
-        $artikel->update([
-            'judul' => $request->judul,
-            'link' => $request->link,
-        ]);
+        $artikel->update($request->only('judul', 'link'));
 
-        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil diupdate!');
+        return redirect()->route('admin.artikel.index')
+            ->with('success', 'Artikel berhasil diupdate!');
     }
 
-    // 7. Proses Hapus Artikel dari Database
+    // 6. Delete
     public function artikelDelete($id)
     {
         $artikel = Artikel::findOrFail($id);
         $artikel->delete();
 
-        return redirect()->route('admin.artikel.index')->with('success', 'Artikel berhasil dihapus!');
+        return redirect()->route('admin.artikel.index')
+            ->with('success', 'Artikel berhasil dihapus!');
     }
 }

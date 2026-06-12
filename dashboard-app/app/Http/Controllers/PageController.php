@@ -7,21 +7,65 @@ use App\Models\AktivitasHarian;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AktivitasExport;
+use App\Models\User;
+
 
 class PageController extends Controller
 {
     public function dashboard()
     {
-        $query = AktivitasHarian::query();
+        // 👑 ADMIN DASHBOARD (GLOBAL)
+        if (auth()->user()->role == 'admin') {
 
-        if (auth()->check()) {
-            $query->where('user_id', auth()->id());
+            $aktivitasTerakhir = AktivitasHarian::latest('tanggal')->first();
+
+            $skorKesehatan = $aktivitasTerakhir?->skor ?? 0;
+
+            $kondisi = $this->getKondisi($skorKesehatan);
+
+            $totalUser = User::count();
+            $totalAktivitas = AktivitasHarian::count();
+            $rataSkor = AktivitasHarian::avg('skor');
+
+            // 🛠️ HANYA TAMBAHKAN SATU BARIS INI:
+            $users = User::all(); 
+
+            $ringkasanAktivitas = [
+                'makan' => 'Data seluruh user',
+                'olahraga' => 'Data seluruh user',
+                'tidur' => 'Data seluruh user',
+                'air_minum' => 'Data seluruh user',
+            ];
+
+            $rekomendasiHarian = [
+                'Dashboard admin (data global sistem)',
+                'Gunakan menu riwayat untuk detail user',
+            ];
+
+            return view('admin.dashboard', compact(
+                'skorKesehatan',
+                'ringkasanAktivitas',
+                'rekomendasiHarian',
+                'aktivitasTerakhir',
+                'kondisi',
+                'totalUser',
+                'totalAktivitas',
+                'rataSkor',
+                'users' // 🛠️ DAN TAMBAHKAN INI JUGA
+            ));
         }
 
-        $aktivitasTerakhir = $query->latest('tanggal')->first();
+        // ... ke bawahnya jangan ada yang diubah sama sekali ...
+
+        // 👤 USER DASHBOARD
+        $aktivitasTerakhir = AktivitasHarian::where('user_id', auth()->id())
+            ->latest('tanggal')
+            ->first();
 
         if ($aktivitasTerakhir) {
+
             $skorKesehatan = $aktivitasTerakhir->skor;
+            $kondisi = $this->getKondisi($skorKesehatan);
 
             $ringkasanAktivitas = [
                 'makan' => $aktivitasTerakhir->makan . ' kali',
@@ -31,8 +75,11 @@ class PageController extends Controller
             ];
 
             $rekomendasiHarian = $this->buatRekomendasi($aktivitasTerakhir);
+
         } else {
+
             $skorKesehatan = 0;
+            $kondisi = "Belum ada data";
 
             $ringkasanAktivitas = [
                 'makan' => 'Belum ada data',
@@ -41,17 +88,15 @@ class PageController extends Controller
                 'air_minum' => 'Belum ada data',
             ];
 
-            $rekomendasiHarian = [
-                'Silakan isi aktivitas harian terlebih dahulu.',
-                'Data akan muncul setelah disimpan.',
-            ];
+            $rekomendasiHarian = [];
         }
 
         return view('pages.dashboard', compact(
             'skorKesehatan',
             'ringkasanAktivitas',
             'rekomendasiHarian',
-            'aktivitasTerakhir'
+            'aktivitasTerakhir',
+            'kondisi'
         ));
     }
 
@@ -64,7 +109,7 @@ class PageController extends Controller
     {
         $query = AktivitasHarian::query();
 
-        if (auth()->check()) {
+        if (auth()->user()->role != 'admin') {
             $query->where('user_id', auth()->id());
         }
 
@@ -86,6 +131,16 @@ class PageController extends Controller
 
         $data['user_id'] = auth()->id();
 
+        // 🔥 TAMBAHKAN INI (HITUNG SKOR)
+        $skor = 0;
+
+        $skor += ($data['makan'] >= 3) ? 25 : 10;
+        $skor += ($data['olahraga'] >= 30) ? 25 : 10;
+        $skor += ($data['tidur'] >= 7) ? 25 : 10;
+        $skor += ($data['air_minum'] >= 8) ? 25 : 10;
+
+        $data['skor'] = $skor;
+
         AktivitasHarian::updateOrCreate(
             [
                 'user_id' => auth()->id(),
@@ -97,7 +152,6 @@ class PageController extends Controller
         return redirect()->route('aktivitas')
             ->with('success', 'Aktivitas berhasil disimpan.');
     }
-
     public function artikel()
     {
         return view('pages.artikel');
@@ -108,12 +162,12 @@ class PageController extends Controller
         return view('pages.profil');
     }
 
-    // INI EXPORT PDF (BENAR)
+    // EXPORT PDF
     public function exportPdf()
     {
         $query = AktivitasHarian::query();
 
-        if (auth()->check()) {
+        if (auth()->user()->role != 'admin') {
             $query->where('user_id', auth()->id());
         }
 
@@ -124,10 +178,22 @@ class PageController extends Controller
         return $pdf->download('riwayat-aktivitas.pdf');
     }
 
+    // EXPORT EXCEL
     public function exportExcel()
-{
-    return Excel::download(new AktivitasExport, 'riwayat-aktivitas.xlsx');
-}
+    {
+        $query = AktivitasHarian::query();
+
+        if (auth()->user()->role != 'admin') {
+            $query->where('user_id', auth()->id());
+        }
+
+        $riwayat = $query->latest('tanggal')->get();
+
+        $excel = excel::loadView('pages.export-excel', compact('riwayat'));
+
+        return $excel->download('riwayat-aktivitas.excel');
+    }
+
 
     private function buatRekomendasi(AktivitasHarian $aktivitas): array
     {
@@ -158,5 +224,42 @@ class PageController extends Controller
         }
 
         return $rekomendasi;
+    }
+
+    // DASHBOARD ADMIN
+    public function adminDashboard()
+    {
+        $totalUser = User::count();
+        $totalAktivitas = AktivitasHarian::count();
+
+        $rataSkor = AktivitasHarian::avg('skor');
+
+        $users = User::all();
+
+        $dataSkor = AktivitasHarian::selectRaw('DATE(tanggal) as tanggal, AVG(skor) as skor')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalUser',
+            'totalAktivitas',
+            'rataSkor',
+            'dataSkor',
+            'users'
+        ));
+    }
+
+    private function getKondisi($skor)
+    {
+        if ($skor >= 80)
+            return "Sangat baik";
+        if ($skor >= 60)
+            return "Baik";
+        if ($skor >= 40)
+            return "Cukup";
+        if ($skor >= 20)
+            return "Buruk";
+        return "Sangat buruk";
     }
 }
