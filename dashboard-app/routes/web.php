@@ -51,3 +51,5 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/admin/artikel/{id}', [AdminController::class, 'artikelUpdate'])->name('admin.artikel.update');
     Route::delete('/admin/artikel/{id}', [AdminController::class, 'artikelDelete'])->name('admin.artikel.delete');
 });
+
+Route::get('/riwayat-aktivitas', [PageController::class, 'riwayatIndex'])->name('riwayat.index');

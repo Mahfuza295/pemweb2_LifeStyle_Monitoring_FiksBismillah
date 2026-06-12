@@ -69,19 +69,22 @@
                 </a>
 
                 <!--artikel-->
-                <!-- artikel -->
                 @if(auth()->user()->role == 'admin')
-                    <a href="{{ route('admin.artikel.index') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100">
-                        <i class="fa-solid fa-newspaper w-5 text-center"></i>
-                        <span>Kelola Artikel</span>
-                    </a>
+                            <a href="{{ route('admin.artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                                    {{ request()->routeIs('admin.artikel.*')
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'hover:bg-slate-100' }}">
+                                <i class="fa-solid fa-newspaper w-5 text-center"></i>
+                                <span>Kelola Artikel</span>
+                            </a>
                 @else
-                    <a href="{{ route('artikel.index') }}"
-                        class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100">
-                        <i class="fa-solid fa-newspaper w-5 text-center"></i>
-                        <span>Artikel Edukasi</span>
-                    </a>
+                            <a href="{{ route('artikel.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition
+                                    {{ request()->routeIs('artikel.index')
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'hover:bg-slate-100' }}">
+                                <i class="fa-solid fa-newspaper w-5 text-center"></i>
+                                <span>Artikel Edukasi</span>
+                            </a>
                 @endif
 
                 <!--profil-->
