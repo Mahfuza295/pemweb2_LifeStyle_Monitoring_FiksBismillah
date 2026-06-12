@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/aktivitas', [PageController::class, 'storeAktivitas'])->name('aktivitas.store');
 
+    Route::get('/riwayat-aktivitas', [PageController::class, 'riwayatIndex'])->name('riwayat.index');
+    
     Route::get('/profil', [PageController::class, 'profil'])->name('profil');
 
 });

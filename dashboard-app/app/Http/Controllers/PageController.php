@@ -21,9 +21,9 @@ class PageController extends Controller
             $skorKesehatan = $aktivitasTerakhir->skor;
 
             $ringkasanAktivitas = [
-                'makan'     => $aktivitasTerakhir->makan . ' kali',
-                'olahraga'  => $aktivitasTerakhir->olahraga . ' menit',
-                'tidur'     => $aktivitasTerakhir->tidur . ' jam',
+                'makan' => $aktivitasTerakhir->makan . ' kali',
+                'olahraga' => $aktivitasTerakhir->olahraga . ' menit',
+                'tidur' => $aktivitasTerakhir->tidur . ' jam',
                 'air_minum' => $aktivitasTerakhir->air_minum . ' gelas',
             ];
 
@@ -32,9 +32,9 @@ class PageController extends Controller
             $skorKesehatan = 0;
 
             $ringkasanAktivitas = [
-                'makan'     => 'Belum ada data',
-                'olahraga'  => 'Belum ada data',
-                'tidur'     => 'Belum ada data',
+                'makan' => 'Belum ada data',
+                'olahraga' => 'Belum ada data',
+                'tidur' => 'Belum ada data',
                 'air_minum' => 'Belum ada data',
             ];
 
@@ -52,7 +52,15 @@ class PageController extends Controller
         ));
     }
 
+    // 1. Halaman Input Aktivitas (Hanya fokus untuk form input saja)
     public function aktivitas()
+    {
+        // Kita tidak perlu mengambil riwayat lagi di sini agar bersih
+        return view('pages.aktivitas');
+    }
+
+    // 2. HALAMAN BARU: Tampil Semua Riwayat Data Harian
+    public function riwayatIndex()
     {
         $query = AktivitasHarian::query();
 
@@ -60,25 +68,27 @@ class PageController extends Controller
             $query->where('user_id', auth()->id());
         }
 
-        $riwayat = $query->latest('tanggal')->take(5)->get();
+        // Mengambil semua data riwayat dari yang paling baru tanpa dibatasi take(5)
+        $riwayat = $query->latest('tanggal')->get();
 
-        return view('pages.aktivitas', compact('riwayat'));
+        // Mengarah ke file baru: resources/views/pages/riwayat.blade.php
+        return view('pages.riwayat', compact('riwayat'));
     }
 
     public function storeAktivitas(Request $request)
     {
         $data = $request->validate([
-            'tanggal'   => 'required|date',
-            'makan'     => 'required|integer|min:0|max:10',
-            'olahraga'  => 'required|integer|min:0|max:300',
-            'tidur'     => 'required|numeric|min:0|max:24',
+            'tanggal' => 'required|date',
+            'makan' => 'required|integer|min:0|max:10',
+            'olahraga' => 'required|integer|min:0|max:300',
+            'tidur' => 'required|numeric|min:0|max:24',
             'air_minum' => 'required|integer|min:0|max:30',
-            'catatan'   => 'nullable|string|max:500',
+            'catatan' => 'nullable|string|max:500',
         ], [
-            'tanggal.required'   => 'Tanggal wajib diisi.',
-            'makan.required'     => 'Jumlah makan wajib diisi.',
-            'olahraga.required'  => 'Durasi olahraga wajib diisi.',
-            'tidur.required'     => 'Durasi tidur wajib diisi.',
+            'tanggal.required' => 'Tanggal wajib diisi.',
+            'makan.required' => 'Jumlah makan wajib diisi.',
+            'olahraga.required' => 'Durasi olahraga wajib diisi.',
+            'tidur.required' => 'Durasi tidur wajib diisi.',
             'air_minum.required' => 'Jumlah air minum wajib diisi.',
         ]);
 
