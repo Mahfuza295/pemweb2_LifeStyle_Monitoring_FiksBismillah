@@ -22,7 +22,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // LANDING
 // =======================
 Route::get('/', function () {
-    return view('welcome');
+    return view('landing');
 });
 
 
@@ -87,3 +87,4 @@ Route::get('/riwayat/export/pdf', [PageController::class, 'exportPdf'])
 
 Route::get('/riwayat/export/excel', [PageController::class, 'exportExcel'])
     ->name('riwayat.export.excel');
+
