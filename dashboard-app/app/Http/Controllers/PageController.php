@@ -9,7 +9,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AktivitasExport;
 use App\Models\User;
 
-
 class PageController extends Controller
 {
     public function dashboard()
@@ -55,11 +54,9 @@ class PageController extends Controller
             ));
         }
 
-        // ... ke bawahnya jangan ada yang diubah sama sekali ...
-
         // 👤 USER DASHBOARD
         $aktivitasTerakhir = AktivitasHarian::where('user_id', auth()->id())
-            ->latest('tanggal')
+            ->latest('id') // ⚡ Urut berdasarkan ID data terakhir masuk
             ->first();
 
         if ($aktivitasTerakhir) {
@@ -131,9 +128,8 @@ class PageController extends Controller
 
         $data['user_id'] = auth()->id();
 
-        // 🔥 TAMBAHKAN INI (HITUNG SKOR)
+        // 🔥 HITUNG SKOR
         $skor = 0;
-
         $skor += ($data['makan'] >= 3) ? 25 : 10;
         $skor += ($data['olahraga'] >= 30) ? 25 : 10;
         $skor += ($data['tidur'] >= 7) ? 25 : 10;
@@ -141,6 +137,7 @@ class PageController extends Controller
 
         $data['skor'] = $skor;
 
+        // Gunakan updateOrCreate agar data di tanggal yang sama ter-update, bukan membuat baris baru
         AktivitasHarian::updateOrCreate(
             [
                 'user_id' => auth()->id(),
@@ -149,9 +146,11 @@ class PageController extends Controller
             $data
         );
 
-        return redirect()->route('aktivitas')
+        // Alihkan halaman kembali langsung ke dashboard utama
+        return redirect()->route('dashboard')
             ->with('success', 'Aktivitas berhasil disimpan.');
     }
+
     public function artikel()
     {
         return view('pages.artikel');
@@ -181,19 +180,9 @@ class PageController extends Controller
     // EXPORT EXCEL
     public function exportExcel()
     {
-        $query = AktivitasHarian::query();
-
-        if (auth()->user()->role != 'admin') {
-            $query->where('user_id', auth()->id());
-        }
-
-        $riwayat = $query->latest('tanggal')->get();
-
-        $excel = excel::loadView('pages.export-excel', compact('riwayat'));
-
-        return $excel->download('riwayat-aktivitas.excel');
+        // 🛠️ FIX: Menggunakan format download class Export bawaan Maatwebsite Excel yang benar
+        return Excel::download(new AktivitasExport, 'riwayat-aktivitas.xlsx');
     }
-
 
     private function buatRekomendasi(AktivitasHarian $aktivitas): array
     {
@@ -231,9 +220,7 @@ class PageController extends Controller
     {
         $totalUser = User::count();
         $totalAktivitas = AktivitasHarian::count();
-
         $rataSkor = AktivitasHarian::avg('skor');
-
         $users = User::all();
 
         $dataSkor = AktivitasHarian::selectRaw('DATE(tanggal) as tanggal, AVG(skor) as skor')

@@ -39,19 +39,22 @@
                 </tr>
 
                 <style>
-                    .dataTables_filter input {
-                        border: 1px solid #cbd5e1;
-                        padding: 6px 10px;
-                        border-radius: 10px;
-                        outline: none;
-                        background: white;
+                    .dataTables_paginate {
+                        margin-top: 15px;
                     }
 
-                    .dataTables_length select {
-                        border: 1px solid #cbd5e1;
-                        padding: 6px 10px;
-                        border-radius: 10px;
-                        background: white;
+                    .dataTables_paginate .paginate_button {
+                        padding: 6px 12px !important;
+                        margin: 0 4px !important;
+                        border: 1px solid #ddd;
+                        border-radius: 6px;
+                        display: inline-block !important;
+                        cursor: pointer;
+                    }
+
+                    .dataTables_paginate .current {
+                        background: #2563eb !important;
+                        color: white !important;
                     }
                 </style>
             </thead>
@@ -87,6 +90,7 @@
                     search: "Cari Data :",
                     lengthMenu: "Tampilkan _MENU_ data",
                     info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+
                     paginate: {
                         previous: "Sebelumnya",
                         next: "Selanjutnya"
