@@ -22,9 +22,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // LANDING
 // =======================
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
-
 
 // =======================
 // ARTIKEL PUBLIK
