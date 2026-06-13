@@ -52,18 +52,39 @@
             </h2>
         </div>
 
-        <div class="space-y-3">
-            @foreach($rekomendasiHarian as $rekomendasi)
-            <div class="bg-slate-50 border rounded-xl p-3 flex gap-3 items-start">
-                <div class="text-blue-600 mt-1">
-                    <i class="fa-solid fa-check"></i>
-                </div>
-                <p class="text-sm text-slate-700">
-                    {{ $rekomendasi }}
+<div class="space-y-3">
+    @forelse($rekomendasiHarian as $rekomendasi)
+
+        @php
+            $warna = match($rekomendasi['tipe']) {
+                'bahaya' => 'bg-red-50 border-red-200 text-red-600',
+                'waspada' => 'bg-yellow-50 border-yellow-200 text-yellow-600',
+                default => 'bg-green-50 border-green-200 text-green-600',
+            };
+        @endphp
+
+        <div class="{{ $warna }} border rounded-xl p-4 flex gap-3 items-start">
+            <div class="mt-1 text-xl">
+                <i class="fa-solid {{ $rekomendasi['icon'] }}"></i>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-sm">
+                    {{ $rekomendasi['judul'] }}
+                </h3>
+
+                <p class="text-sm text-slate-700 mt-1">
+                    {{ $rekomendasi['isi'] }}
                 </p>
             </div>
-            @endforeach
         </div>
+
+    @empty
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+            Belum ada rekomendasi. Silakan input aktivitas harian terlebih dahulu.
+        </div>
+    @endforelse
+</div>
     </div>
 
 </div>
