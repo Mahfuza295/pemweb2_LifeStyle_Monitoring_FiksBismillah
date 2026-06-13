@@ -195,37 +195,92 @@ class PageController extends Controller
     {
         return Excel::download(new AktivitasExport, 'riwayat-aktivitas.xlsx');
     }
+private function buatRekomendasi(AktivitasHarian $aktivitas): array
+{
+    $rekomendasi = [];
 
-    private function buatRekomendasi(AktivitasHarian $aktivitas): array
-    {
-        $rekomendasi = [];
-
-        if ($aktivitas->tidur < 7) {
-            $rekomendasi[] = 'Tidur kurang dari 7 jam.';
-        } else {
-            $rekomendasi[] = 'Tidur sudah cukup.';
-        }
-
-        if ($aktivitas->air_minum < 8) {
-            $rekomendasi[] = 'Kurang minum air.';
-        } else {
-            $rekomendasi[] = 'Hidrasi sudah baik.';
-        }
-
-        if ($aktivitas->olahraga < 30) {
-            $rekomendasi[] = 'Kurang olahraga.';
-        } else {
-            $rekomendasi[] = 'Olahraga cukup.';
-        }
-
-        if ($aktivitas->makan < 3) {
-            $rekomendasi[] = 'Pola makan kurang.';
-        } else {
-            $rekomendasi[] = 'Pola makan baik.';
-        }
-
-        return $rekomendasi;
+    if ($aktivitas->skor < 40) {
+        $rekomendasi[] = [
+            'tipe' => 'bahaya',
+            'judul' => 'Peringatan kesehatan',
+            'isi' => 'Skor kesehatan Anda rendah. Segera perbaiki pola makan, tidur, olahraga, dan konsumsi air minum.',
+            'icon' => 'fa-triangle-exclamation'
+        ];
+    } elseif ($aktivitas->skor < 60) {
+        $rekomendasi[] = [
+            'tipe' => 'waspada',
+            'judul' => 'Kesehatan perlu diperhatikan',
+            'isi' => 'Kondisi Anda belum stabil. Mulailah memperbaiki kebiasaan harian secara bertahap.',
+            'icon' => 'fa-circle-exclamation'
+        ];
     }
+
+    if ($aktivitas->tidur < 7) {
+        $rekomendasi[] = [
+            'tipe' => 'waspada',
+            'judul' => 'Tidur kurang',
+            'isi' => 'Tidur Anda kurang dari 7 jam. Coba tidur lebih awal agar tubuh lebih segar.',
+            'icon' => 'fa-bed'
+        ];
+    } else {
+        $rekomendasi[] = [
+            'tipe' => 'aman',
+            'judul' => 'Tidur cukup',
+            'isi' => 'Durasi tidur Anda sudah baik. Pertahankan pola tidur ini.',
+            'icon' => 'fa-circle-check'
+        ];
+    }
+
+    if ($aktivitas->air_minum < 8) {
+        $rekomendasi[] = [
+            'tipe' => 'waspada',
+            'judul' => 'Kurang minum air',
+            'isi' => 'Minum air Anda masih kurang. Usahakan minimal 8 gelas per hari.',
+            'icon' => 'fa-droplet'
+        ];
+    } else {
+        $rekomendasi[] = [
+            'tipe' => 'aman',
+            'judul' => 'Hidrasi baik',
+            'isi' => 'Konsumsi air minum Anda sudah cukup.',
+            'icon' => 'fa-circle-check'
+        ];
+    }
+
+    if ($aktivitas->olahraga < 30) {
+        $rekomendasi[] = [
+            'tipe' => 'waspada',
+            'judul' => 'Kurang olahraga',
+            'isi' => 'Olahraga Anda kurang dari 30 menit. Coba jalan kaki ringan atau stretching.',
+            'icon' => 'fa-person-running'
+        ];
+    } else {
+        $rekomendasi[] = [
+            'tipe' => 'aman',
+            'judul' => 'Olahraga cukup',
+            'isi' => 'Aktivitas olahraga Anda sudah bagus. Pertahankan kebiasaan ini.',
+            'icon' => 'fa-circle-check'
+        ];
+    }
+
+    if ($aktivitas->makan < 3) {
+        $rekomendasi[] = [
+            'tipe' => 'bahaya',
+            'judul' => 'Pola makan kurang',
+            'isi' => 'Anda makan kurang dari 3 kali. Usahakan makan teratur agar energi tetap stabil.',
+            'icon' => 'fa-utensils'
+        ];
+    } else {
+        $rekomendasi[] = [
+            'tipe' => 'aman',
+            'judul' => 'Pola makan baik',
+            'isi' => 'Pola makan Anda sudah cukup teratur.',
+            'icon' => 'fa-circle-check'
+        ];
+    }
+
+    return $rekomendasi;
+}
 
     // DASHBOARD ADMIN
     public function adminDashboard()
