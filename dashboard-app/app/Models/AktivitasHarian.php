@@ -17,21 +17,25 @@ class AktivitasHarian extends Model
         'air_minum',
         'catatan',
         'skor',
+        'kalori'
     ];
 
-    // AUTO HITUNG SKOR SAAT SIMPAN
+    // AUTO HITUNG SKOR & KALORI SAAT SIMPAN
     protected static function booted()
     {
         static::saving(function ($model) {
 
+            // 1. Hitung Skor Otomatis
             $skor = 0;
-
             $skor += ($model->makan >= 3) ? 25 : 10;
             $skor += ($model->olahraga >= 30) ? 25 : 10;
             $skor += ($model->tidur >= 7) ? 25 : 10;
             $skor += ($model->air_minum >= 8) ? 25 : 10;
 
             $model->skor = $skor;
+
+            // 🔥 2. AMANKAN KALORI (Hitung ulang di sini agar tidak hilang)
+            $model->kalori = $model->makan * 500;
         });
     }
 

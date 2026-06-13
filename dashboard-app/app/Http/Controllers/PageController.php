@@ -26,7 +26,6 @@ class PageController extends Controller
             $totalAktivitas = AktivitasHarian::count();
             $rataSkor = AktivitasHarian::avg('skor');
 
-            // 🛠️ HANYA TAMBAHKAN SATU BARIS INI:
             $users = User::all(); 
 
             $ringkasanAktivitas = [
@@ -50,13 +49,13 @@ class PageController extends Controller
                 'totalUser',
                 'totalAktivitas',
                 'rataSkor',
-                'users' // 🛠️ DAN TAMBAHKAN INI JUGA
+                'users'
             ));
         }
 
         // 👤 USER DASHBOARD
         $aktivitasTerakhir = AktivitasHarian::where('user_id', auth()->id())
-            ->latest('id') // ⚡ Urut berdasarkan ID data terakhir masuk
+            ->latest('id') 
             ->first();
 
         if ($aktivitasTerakhir) {
@@ -69,6 +68,7 @@ class PageController extends Controller
                 'olahraga' => $aktivitasTerakhir->olahraga . ' menit',
                 'tidur' => $aktivitasTerakhir->tidur . ' jam',
                 'air_minum' => $aktivitasTerakhir->air_minum . ' gelas',
+                'kalori' => ($aktivitasTerakhir->kalori ?? 0) . ' kcal', // 🔥 KIRIM KALORI KE DASHBOARD
             ];
 
             $rekomendasiHarian = $this->buatRekomendasi($aktivitasTerakhir);
@@ -83,6 +83,7 @@ class PageController extends Controller
                 'olahraga' => 'Belum ada data',
                 'tidur' => 'Belum ada data',
                 'air_minum' => 'Belum ada data',
+                'kalori' => 'Belum ada data', // 🔥 DATA CADANGAN JIKA KOSONG
             ];
 
             $rekomendasiHarian = [];
@@ -99,6 +100,11 @@ class PageController extends Controller
 
     public function aktivitas()
     {
+        // 🛑 KEAMANAN: Blokir admin jika mencoba tembus lewat URL langsung
+        if (auth()->user()->role == 'admin') {
+            abort(403, 'Admin tidak memiliki akses untuk menginput aktivitas.');
+        }
+
         return view('pages.aktivitas');
     }
 
@@ -117,6 +123,11 @@ class PageController extends Controller
 
     public function storeAktivitas(Request $request)
     {
+        // 🛑 KEAMANAN: Blokir admin jika mencoba kirim form bypass data
+        if (auth()->user()->role == 'admin') {
+            abort(403, 'Admin tidak diizinkan menyimpan data aktivitas.');
+        }
+
         $data = $request->validate([
             'tanggal' => 'required|date',
             'makan' => 'required|integer|min:0|max:10',
@@ -128,7 +139,7 @@ class PageController extends Controller
 
         $data['user_id'] = auth()->id();
 
-        // 🔥 HITUNG SKOR
+        // 🔥 HITUNG SKOR (Cukup 1 kali eksekusi)
         $skor = 0;
         $skor += ($data['makan'] >= 3) ? 25 : 10;
         $skor += ($data['olahraga'] >= 30) ? 25 : 10;
@@ -137,7 +148,10 @@ class PageController extends Controller
 
         $data['skor'] = $skor;
 
-        // Gunakan updateOrCreate agar data di tanggal yang sama ter-update, bukan membuat baris baru
+        // 🍳 HITUNG PERKIRAAN KALORI (1x makan = 500 kkal)
+        $data['kalori'] = $data['makan'] * 500; 
+
+        // Simpan data (Cukup 1 kali eksekusi)
         AktivitasHarian::updateOrCreate(
             [
                 'user_id' => auth()->id(),
@@ -146,7 +160,6 @@ class PageController extends Controller
             $data
         );
 
-        // Alihkan halaman kembali langsung ke dashboard utama
         return redirect()->route('dashboard')
             ->with('success', 'Aktivitas berhasil disimpan.');
     }
@@ -180,7 +193,6 @@ class PageController extends Controller
     // EXPORT EXCEL
     public function exportExcel()
     {
-        // 🛠️ FIX: Menggunakan format download class Export bawaan Maatwebsite Excel yang benar
         return Excel::download(new AktivitasExport, 'riwayat-aktivitas.xlsx');
     }
 

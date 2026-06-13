@@ -16,6 +16,10 @@ return new class extends Migration {
             $table->integer('olahraga');
             $table->float('tidur');
             $table->integer('air_minum');
+            
+            // TAMBAHKAN DUA KOLOM BARU INI
+            $table->integer('skor')->default(0);
+            $table->integer('kalori')->default(0);
 
             $table->text('catatan')->nullable();
 
