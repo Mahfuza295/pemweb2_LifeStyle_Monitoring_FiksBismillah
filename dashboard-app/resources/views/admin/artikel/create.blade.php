@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+
+ <!-- CARD DALAM TAMBAH ARTIKEL -->
 <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-md overflow-hidden border border-slate-100">
     <div class="p-6 border-b border-slate-100">
         <h5 class="text-lg font-bold text-slate-800">Tambah Artikel Baru</h5>

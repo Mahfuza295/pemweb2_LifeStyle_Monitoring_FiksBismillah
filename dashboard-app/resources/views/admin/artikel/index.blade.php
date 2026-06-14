@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="mb-6 flex justify-between items-center">
         <div>
             <h2 class="text-xl font-bold text-slate-800">Manajemen Artikel</h2>
