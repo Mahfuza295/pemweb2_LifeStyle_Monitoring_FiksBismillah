@@ -22,7 +22,7 @@ class PageController extends Controller
     // ==========================================
     public function dashboard()
     {
-        // 🛡️ JIKA YANG LOGIN ADALAH ADMIN
+        // JIKA YANG LOGIN ADALAH ADMIN
         if (auth()->user()->role == 'admin') {
 
             // Mengambil 1 data aktivitas terbaru dari database secara global (dari semua user) berdasarkan tanggal terbaru
@@ -70,7 +70,7 @@ class PageController extends Controller
             ));
         }
 
-        // 👤 JIKA YANG LOGIN ADALAH USER/PENGGUNA BIASA
+        // JIKA YANG LOGIN ADALAH USER/PENGGUNA BIASA
         // Mengambil 1 data aktivitas terbaru yang ID pemiliknya cocok dengan ID user yang sedang login saat ini
         $aktivitasTerakhir = AktivitasHarian::where('user_id', auth()->id())
             ->latest('id') 
@@ -125,7 +125,7 @@ class PageController extends Controller
     // ==========================================
     public function aktivitas()
     {
-        // 🛑 SISTEM KEAMANAN: Jika admin mencoba mengetik URL /aktivitas secara paksa, langsung blokir (Error 403)
+        // SISTEM KEAMANAN: Jika admin mencoba mengetik URL /aktivitas secara paksa, langsung blokir (Error 403)
         if (auth()->user()->role == 'admin') {
             abort(403, 'Admin tidak memiliki akses untuk menginput aktivitas.');
         }
@@ -159,7 +159,7 @@ class PageController extends Controller
     // ==========================================
     public function storeAktivitas(Request $request)
     {
-        // 🛑 SISTEM KEAMANAN: Blokir admin jika mencoba mengirim data manipulasi lewat form bypass
+        // SISTEM KEAMANAN: Blokir admin jika mencoba mengirim data manipulasi lewat form bypass
         if (auth()->user()->role == 'admin') {
             abort(403, 'Admin tidak diizinkan menyimpan data aktivitas.');
         }
@@ -177,7 +177,7 @@ class PageController extends Controller
         // Menyisipkan ID user yang sedang login ke dalam array data agar sistem tahu ini catatan milik siapa
         $data['user_id'] = auth()->id();
 
-        // 🧮 LOGIKA PERHITUNGAN SKOR OTOMATIS (Maksimal akumulasi poin = 100)
+        // LOGIKA PERHITUNGAN SKOR OTOMATIS (Maksimal akumulasi poin = 100)
         $skor = 0;
         // Jika makan 3 kali atau lebih dapat 25 poin, jika kurang dari 3 kali cuma dapat 10 poin
         $skor += ($data['makan'] >= 3) ? 25 : 10;
@@ -356,7 +356,7 @@ class PageController extends Controller
         $rataSkor = AktivitasHarian::avg('skor');
         $users = User::all();
 
-        // 📈 LOGIKA GRAFIK KESEHATAN: Mengambil rata-rata nilai skor seluruh user, 
+        // LOGIKA GRAFIK KESEHATAN: Mengambil rata-rata nilai skor seluruh user, 
         // lalu dikelompokkan (GROUP BY) berdasarkan tanggal kalender agar membentuk diagram garis yang urut.
         $dataSkor = AktivitasHarian::selectRaw('DATE(tanggal) as tanggal, AVG(skor) as skor')
             ->groupBy('tanggal')
