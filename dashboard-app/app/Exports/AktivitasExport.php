@@ -2,56 +2,62 @@
 
 namespace App\Exports;
 
+// Mengimpor Model AktivitasHarian untuk mengambil data dari database
 use App\Models\AktivitasHarian;
-// Mengimport library Laravel Excel agar fitur-fitur export bisa digunakan
+// Mengimpor interface FromCollection agar bisa mengekspor data berbasis kumpulan data (Collection)
 use Maatwebsite\Excel\Concerns\FromCollection;
+// Mengimpor interface WithHeadings untuk memberikan baris judul/kepala tabel di file Excel
 use Maatwebsite\Excel\Concerns\WithHeadings;
+// Mengimpor interface ShouldAutoSize agar lebar kolom Excel otomatis menyesuaikan panjang teks
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-// ShouldAutoSize: Berfungsi agar lebar kolom Excel otomatis pas dengan panjang teks
+// Class ini mengimplementasikan 3 fitur Laravel Excel: Ambil Data, Bikin Judul Kolom, dan Auto Lebar Kolom
 class AktivitasExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
-    /**
-     * Fungsi untuk mengambil dan menstrukturkan data yang akan dimasukkan ke Excel
-     */
+    // ==========================================
+    // 1. FUNGSI MENGAMBIL & MENYUSUN DATA EXCEL
+    // ==========================================
     public function collection()
     {
-        // Menyiapkan query dasar untuk mengambil data dari tabel 'aktivitas_harian'
+        // Menyiapkan perintah query dasar ke tabel AktivitasHarian
         $query = AktivitasHarian::query();
 
-        // Fitur Keamanan: Cek apakah ada user yang sedang login
+        // Keamanan: Memastikan hanya user yang sudah login (auth()->check()) yang datanya ditarik
         if (auth()->check()) {
-            // Jika ada, filter data agar yang diambil HANYA data milik user yang sedang login tersebut
+            // Saring data: Hanya mengambil catatan aktivitas milik user yang sedang login saat ini
             $query->where('user_id', auth()->id());
         }
 
-        // Ambil data terbaru berdasarkan tanggal, lalu susun kolomnya secara manual
+        // Ambil data terbaru berdasarkan tanggal, lalu susun kolomnya menggunakan fungsi map()
         return $query->latest('tanggal')->get()->map(function ($item) {
+            // Di sini kita mengatur urutan kolom data yang akan muncul di baris Excel nanti
             return [
-                $item->tanggal,      // Baris data untuk Kolom Tanggal
-                $item->makan,        // Baris data untuk Kolom Makan
-                $item->olahraga,     // Baris data untuk Kolom Olahraga
-                $item->tidur,        // Baris data untuk Kolom Tidur
-                $item->air_minum,    // Baris data untuk Kolom Air Minum
-                $item->skor ?? 0,    // Baris data untuk Kolom Skor (Jika kosong/null, otomatis diisi angka 0)
-                $item->catatan,      // Baris data untuk Kolom Catatan
+                $item->tanggal,      // Kolom A: Berisi tanggal aktivitas
+                $item->makan,        // Kolom B: Berisi berapa kali makan
+                $item->olahraga,     // Kolom C: Berisi durasi olahraga (menit)
+                $item->tidur,        // Kolom D: Berisi durasi tidur (jam)
+                $item->air_minum,    // Kolom E: Berisi jumlah air minum (gelas)
+                $item->skor ?? 0,    // Kolom F: Berisi skor kesehatan harian, jika kosong diisi angka 0
+                $item->catatan,      // Kolom G: Berisi catatan tambahan dari user
             ];
         });
     }
 
-    /**
-     * Fungsi untuk membuat judul kolom (Header) pada baris paling atas di Excel
-     */
+    // ==========================================
+    // 2. FUNGSI MEMBUAT JUDUL BARIS UTAMA (HEADER)
+    // ==========================================
     public function headings(): array
     {
+        // Mengembalikan array teks yang akan menjadi baris paling atas (Baris 1) di file Excel
+        // Posisinya harus berurutan pas dengan urutan data di fungsi collection() di atas
         return [
-            'Tanggal',
-            'Makan',
-            'Olahraga (menit)',
-            'Tidur (jam)',
-            'Air Minum',
-            'Skor',
-            'Catatan'
+            'Tanggal',         
+            'Makan',            
+            'Olahraga (menit)', 
+            'Tidur (jam)',     
+            'Air Minum',       
+            'Skor',             
+            'Catatan'           
         ];
     }
 }
