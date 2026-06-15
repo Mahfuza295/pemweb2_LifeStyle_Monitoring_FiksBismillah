@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 // Mengimpor interface ShouldAutoSize agar lebar kolom Excel otomatis menyesuaikan panjang teks
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-// Class ini mengimplementasikan 3 fitur Laravel Excel: Ambil Data, Bikin Judul Kolom, dan Auto Lebar Kolom
+
 class AktivitasExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     // ==========================================
@@ -32,13 +32,13 @@ class AktivitasExport implements FromCollection, WithHeadings, ShouldAutoSize
         return $query->latest('tanggal')->get()->map(function ($item) {
             // Di sini kita mengatur urutan kolom data yang akan muncul di baris Excel nanti
             return [
-                $item->tanggal,      // Kolom A: Berisi tanggal aktivitas
-                $item->makan,        // Kolom B: Berisi berapa kali makan
-                $item->olahraga,     // Kolom C: Berisi durasi olahraga (menit)
-                $item->tidur,        // Kolom D: Berisi durasi tidur (jam)
-                $item->air_minum,    // Kolom E: Berisi jumlah air minum (gelas)
-                $item->skor ?? 0,    // Kolom F: Berisi skor kesehatan harian, jika kosong diisi angka 0
-                $item->catatan,      // Kolom G: Berisi catatan tambahan dari user
+                $item->tanggal,      
+                $item->makan,        
+                $item->olahraga,     
+                $item->tidur,        
+                $item->air_minum,    
+                $item->skor ?? 0,    
+                $item->catatan,      
             ];
         });
     }

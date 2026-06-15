@@ -13,6 +13,8 @@ class AdminMiddleware
         Closure $next
     ): Response {
 
+    // PENGECEKAN KEAMANAN:
+
         if (auth()->check() &&
             auth()->user()->role == 'admin') {
 
